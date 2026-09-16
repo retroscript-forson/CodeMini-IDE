@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CodeMini IDE</title>
+
+    <script>
+        if (/Android/i.test(navigator.userAgent)) {
+            document.documentElement.classList.add('is-android');
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="themes.css">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1e1e1e" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/icons/icon.png">
+</head>
+
+<body>
+    <script src="preloader.js"></script>
+
+    <div id="windowBar" class="window-bar"></div>
+
+    <div class="top-menu">
+        <div class="top-left">
+            <div class="nav-dropdown-container">
+                <i class="ri-more-fill" id="moreMenuBtn" style="cursor: pointer;"></i>
+                <div class="explorer-dropdown" id="moreDropdown">
+                    <div class="dropdown-item" id="menuSave"><i class="ri-save-line"></i> Save</div>
+                    <div class="dropdown-item" id="menuSaveAs"><i class="ri-save-3-line"></i> Save As...</div>
+                    <div class="dropdown-item" id="menuSaveAll"><i class="ri-save-2-line"></i> Save All</div>
+                    <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                    <div class="dropdown-item" id="menuNewWindow"><i class="ri-window-line"></i> New Window</div>
+                    <div class="dropdown-item" id="menuNewWindowProfile"><i class="ri-user-smile-line"></i> New Window
+                        with Profile</div>
+                    <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                    <div class="dropdown-item" id="menuGroupTabs"><i class="ri-folder-add-line"></i> Group Tabs</div>
+                    <div class="dropdown-item" id="menuCloseAll"><i class="ri-close-circle-line"></i> Close All Tabs
+                    </div>
+                    <div class="dropdown-item" id="menuCloseSaved"><i class="ri-check-double-line"></i> Close Saved
+                    </div>
+                    <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                    <div class="dropdown-item" id="menuHelp"><i class="ri-question-line"></i> Help</div>
+                </div>
+            </div>
+
+            <div class="nav-dropdown-container">
+                <i class="ri-arrow-left-line" id="navBackBtn"></i>
+                <div class="explorer-dropdown" id="navBackDropdown">
+                    <div class="dropdown-item" id="menuUndo"><i class="ri-arrow-go-back-line"></i> Undo</div>
+                    <div class="dropdown-item" id="menuHistBack"><i class="ri-history-line"></i> History Back</div>
+                </div>
+            </div>
+
+            <div class="nav-dropdown-container">
+                <i class="ri-arrow-right-line" id="navFwdBtn"></i>
+                <div class="explorer-dropdown" id="navFwdDropdown">
+                    <div class="dropdown-item" id="menuRedo"><i class="ri-arrow-go-forward-line"></i> Redo</div>
+                    <div class="dropdown-item" id="menuHistFwd"><i class="ri-history-line"></i> History Forward</div>
+                </div>
+            </div>
+        </div>
+                <div class="top-center">
+            <i class="ri-list-settings-line hide-on-mobile" id="topAdvancedSearchBtn" title="Advanced Search"></i>
+            <div class="search-bar">
+                <i class="ri-search-2-line"></i>
+                <input type="text" placeholder="Workspace">
+            </div>
+        </div>
+        <div class="top-right">
+            <i class="ri-layout-left-line hide-on-mobile" id="topLayoutLeftBtn" title="Toggle Sidebar" style="cursor: pointer;"></i>
+            <i class="ri-layout-bottom-line hide-on-mobile" id="topLayoutBottomBtn" title="Toggle Bottom Panel" style="cursor: pointer;"></i>
+            <i class="ri-layout-column-line" id="splitLayoutBtn" style="cursor: pointer;"></i>
+            <div class="nav-dropdown-container">
+                <i class="ri-menu-line" id="layoutMenuBtn" style="cursor: pointer;"></i>
+                <div class="explorer-dropdown" id="layoutDropdown" style="right: 0; left: auto;">
+                    <div class="dropdown-item" id="layoutZenMode"><i class="ri-fullscreen-line"></i> Toggle Zen Mode</div>
+                    <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                    <div class="dropdown-item" id="layoutToggleActivity"><i class="ri-layout-left-line"></i> Toggle Activity Bar</div>
+                    <div class="dropdown-item" id="layoutToggleTabs"><i class="ri-layout-top-line"></i> Toggle Tab Bar</div>
+                    <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                    <div class="dropdown-item" id="layoutToggleExplorer"><i class="ri-folder-4-line"></i> Toggle Explorer</div>
+                    <div class="dropdown-item" id="layoutToggleSearch"><i class="ri-search-2-line"></i> Toggle Search</div>
+                    <div class="dropdown-item" id="layoutToggleStacks"><i class="ri-stack-line"></i> Toggle Stacks</div>
+                    <div class="dropdown-item" id="layoutTogglePreview" style="display: none;"><i class="ri-play-line"></i> Toggle Preview</div>
+                    <div class="dropdown-item" id=""><i class="ri-plug-line"></i> Toggle Extensions</div>
+                    <div class="dropdown-item" id="layoutOpenTerminal"><i class="ri-terminal-window-line"></i> Open Terminal</div>
+                    <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                    <div class="dropdown-item" id="layoutOpenProfile"><i class="ri-user-4-line"></i> Open Profile</div>
+                    <div class="dropdown-item" id="layoutOpenSettings"><i class="ri-settings-6-line"></i> Open Settings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-body">
+
+        <div class="activity-bar">
+            <div class="activity-top">
+                <div class="activity-item nav-dropdown-container" id="mainMenuBtnItem">
+                    <i class="ri-menu-2-line"></i>
+                    <div class="explorer-dropdown" id="mainMenuDropdown" style="left: 100%; top: 0; margin-left: 2px;">
+                        <div class="dropdown-item" id="menuAgent"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--icon-gray);"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Agent Mini</div>
+                        <div class="dropdown-item" id="menuCollab"><i class="ri-group-line"></i> Live Collab</div>
+                        <div class="dropdown-item" id="menuDatabase"><i class="ri-database-2-line"></i> Database</div>
+                        <div class="dropdown-item" id="menuSource"><i class="ri-git-branch-line"></i> Source Control</div>
+                    </div>
+                </div>
+
+                <div class="activity-item" id="folderIconItem">
+                    <i class="ri-folder-4-line"></i>
+                </div>
+                <div class="activity-item" id="searchIconItem">
+                    <i class="ri-search-2-line"></i>
+                </div>
+                <div class="activity-item" id="stackIconItem">
+                    <i class="ri-stack-line"></i>
+                </div>
+                <div class="activity-item" id="playIconItem" style="display: none;">
+                    <i class="ri-play-line" style="font-size: 25px;"></i>
+                </div>
+                <div class="activity-item" id="extensionIconItem">
+                    <i class="ri-plug-line"></i>
+                </div>
+                <div class="activity-item" id="terminalIconItem">
+                    <i class="ri-terminal-window-line"></i>
+                </div>
+            </div>
+            <div class="activity-bottom">
+                <div class="activity-item" id="profileIconItem">
+                    <i class="ri-user-4-line"></i>
+                </div>
+                <div class="activity-item" id="settingsIconItem">
+                    <i class="ri-settings-6-line"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar" id="explorerSidebar">
+            <div class="file-browser-toolbar">
+                <div class="file-browser-left-actions" style="display: flex; gap: 10px; align-items: center;">
+                    <div class="explorer-dropdown-container">
+                        <button class="add-button" id="explorerAddBtn"><i class="ri-add-line"></i></button>
+                        <div class="explorer-dropdown" id="explorerDropdown">
+                            <div class="dropdown-item" id="menuNewFile"><i class="ri-file-add-line"></i> New File</div>
+                            <div class="dropdown-item" id="menuNewLockedFile"><i class="ri-file-lock-line"></i> New
+                                Locked File</div>
+                            <div class="dropdown-item" id="menuNewLockedFolder"><i class="ri-folder-lock-line"></i> New
+                                Locked Folder</div>
+                            <div class="dropdown-item" id="menuNewWorkspace"><i class="ri-folder-5-line"></i> New
+                                Workspace</div>
+                        </div>
+                    </div>
+                    <i class="ri-folder-add-line" id="addFolderBtn" title="New Folder"
+                        style="cursor: pointer; font-size: 18px; color: var(--icon-gray);"></i>
+                </div>
+
+                <div class="file-browser-actions">
+                    <i class="ri-upload-line" title="Upload"></i>
+                    <i class="ri-download-line" title="Download"></i>
+                    <i class="ri-node-tree" id="treeViewBtn" title="Toggle Tree View"></i>
+                    <i class="ri-checkbox-multiple-line" id="multiSelectBtn" title="Multi-Select"></i>
+                    <div class="explorer-dropdown-container" style="display:inline-block;">
+                        <i class="ri-folder-5-line" id="workspaceMenuBtn" title="Workspaces"></i>
+                        <div class="explorer-dropdown" id="workspaceDropdown" style="left: auto; right: 0;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="explorerUploadZone" class="explorer-action-zone" style="display: none;     padding: 14px 12px;">
+                <i class="ri-upload-cloud-2-line" style="font-size: 16px; margin-right: 6px;"></i>
+                <span style="flex:1;"> Drop files/folders here or click to browse</span>
+                <input type="file" id="explorerUploadInput" multiple style="display: none;">
+            </div>
+
+            <div id="explorerDownloadToolbar" class="explorer-action-zone"
+                style="display: none; padding: 12px 14px; justify-content: space-between;">
+                <span style="color: var(--text-muted); font-weight: 600;">Download Selection:</span>
+                <div style="display: flex; gap: 6px;">
+                    <button id="dlRawBtn" class="dl-action-btn" title="Download single file">Raw</button>
+                    <button id="dlJsonBtn" class="dl-action-btn" title="Download as JSON">JSON</button>
+                    <button id="dlZipBtn" class="dl-action-btn" title="Download as ZIP">ZIP</button>
+                </div>
+            </div>
+
+            <div class="explorer-search-bar" style="padding: 8px 12px;">
+                <div class="search-bar" style="width: 100%; max-width: 100%; padding: 6px 10px;">
+                    <i class="ri-search-2-line"></i>
+                    <input type="text" id="explorerSearchInput" placeholder="Search files and folders...">
+                </div>
+            </div>
+
+            <div class="file-browser-path" id="fileBrowserPath">
+                <i class="ri-folder-5-line" style="color: var(--icon-gray)"></i>
+                <p style="font-size: 10px; cursor: pointer;">codemini /</p>
+            </div>
+
+            <div class="file-browser-header">
+                <span id="sortNameBtn" style="cursor: pointer;">Name <i id="sortNameIcon" class="ri-arrow-down-s-line"
+                        style="color: var(--text-muted)"></i></span>
+                <span>Last Modified</span>
+            </div>
+
+            <div class="file-browser-list" id="fileList">
+                <div class="empty-state" id="emptyState">Workspace is empty</div>
+            </div>
+        </div>
+
+        <div class="sidebar" id="searchSidebar">
+            <div class="file-browser-header"
+                style="padding: 13px 15px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Search & Replace</span>
+                <i class="ri-close-line" id="closeSearchBtn"
+                    style="cursor: pointer; font-size: 16px; color: var(--icon-gray);"
+                    title="Close and Clear Search"></i>
+            </div>
+            <div class="search-sidebar-content">
+                <div class="search-input-group">
+                    <input type="text" id="globalSearchInput" placeholder="Search Workspace...">
+                    <input type="text" id="globalReplaceInput" placeholder="Replace (Active Tab)...">
+                </div>
+                <div class="search-actions">
+                    <button class="search-btn" id="runSearchBtn">Search</button>
+                    <button class="search-btn" id="runReplaceBtn"
+                        style="background-color: var(--icon-gray);">Replace</button>
+                </div>
+                <div class="search-results-container" id="searchResultsContainer">
+                    <div class="empty-state">No results</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar" id="stackSidebar"></div>
+
+        <div class="content-area">
+            <div class="editor-split-view" id="splitView">
+                <div class="editor-group active-group" id="editorGroup1">
+                    <div class="tabs-bar">
+                        <div class="tab active" data-target="pane-workspace" data-type="workspace">
+                            <i class="ri-apps-2-line"></i>
+                            <span>Workspace</span>
+                            <i class="ri-close-line tab-close"></i>
+                        </div>
+                        <div class="add-tab">
+                            <i class="ri-add-line"></i>
+                        </div>
+                    </div>
+
+                    <div class="panes-container">
+                        <div class="content-pane active launcher-workspace" id="pane-workspace">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="problemsPanel" class="bottom-panel" style="display: none;">
+                <div id="bottomPanelResizer" class="panel-resizer-horizontal"></div>
+
+                <div class="bottom-panel-header">
+                    <div class="bottom-panel-tabs">
+                        <div class="bottom-panel-tab active" data-target="problemsPanelContent">Problems</div>
+                        <div class="bottom-panel-tab" data-target="consolePanelContent">Console</div>
+                        <div class="bottom-panel-tab" data-target="debugPanelContent">Debug Console</div>
+                    </div>
+
+                    <div class="bottom-panel-actions">
+                        <i class="ri-close-line" id="closeProblemsPanel" style="cursor: pointer;"
+                            title="Close Panel"></i>
+                    </div>
+                </div>
+                <div class="bottom-panel-content" id="problemsPanelContent">
+                    <div class="empty-state">No problems detected in open files.</div>
+                </div>
+
+                <div class="bottom-panel-content" id="consolePanelContent"
+                    style="display: none; flex-direction: column; height: 100%; padding: 0;">
+                    <div id="bpConsoleOutput"
+                        style="flex: 1; padding: 10px; overflow-y: auto; font-family: var(--font-mono); color: var(--text-muted); font-size: 13px;">
+                        <div style="margin-bottom: 5px;">[Info] Select a block of code then click on Run in Console to
+                            execute.</div>
+                        <div style="margin-bottom: 5px;">[Info] Click on the play icon to execute the whole file.</div>
+                        <div style="margin-bottom: 5px;">[Info] Click on the terminal icon to connect to a terminal
+                            window.</div>
+                        <div style="margin-bottom: 5px; color: var(--accent-blue);">[Info] Ready for execution.</div>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: flex-end; align-items: center; padding: 4px 10px; border-top: 1px solid var(--border-color); gap: 12px;">
+                        <i class="ri-terminal-window-line" id="bpConsoleConnectTerminalBtn" title="Connect to Terminal"
+                            style="cursor: pointer; color: var(--icon-gray); font-size: 16px; margin-right: auto; transition: color 0.2s;"></i>
+                        <i class="ri-link-unlink-m" id="bpConsoleDisconnectTerminalBtn" title="Disconnect Terminal"
+                            style="display: none; cursor: pointer; color: var(--icon-gray); font-size: 16px; margin-right: auto; transition: color 0.2s;"></i>
+                        <i class="ri-play-fill" id="bpConsolePlayBtn" title="Run Active File"
+                            style="cursor: pointer; color: var(--icon-gray); font-size: 16px; transition: color 0.2s;"></i>
+                        <i class="ri-stop-mini-fill disabled" id="bpConsoleStopBtn" title="Stop Execution"
+                            style="cursor: pointer; color: var(--icon-gray); font-size: 16px; transition: color 0.2s;"></i>
+                        <i class="ri-eraser-line" id="bpConsoleClearBtn" title="Clear Console"
+                            style="cursor: pointer; color: var(--icon-gray); font-size: 16px; transition: color 0.2s;"></i>
+                    </div>
+                    <div style="display: flex; padding: 5px; background: var(--bg-white);">
+                        <span
+                            style="color: var(--accent-blue); padding: 5px 8px; font-family: var(--font-mono); font-weight: bold;">></span>
+                        <input type="text" id="bpConsoleInput"
+                            style="flex: 1; border: none; background: transparent; outline: none; color: var(--text-main); font-family: var(--font-mono); padding: 5px;"
+                            placeholder="Evaluate expression (javascript)...">
+                    </div>
+                </div>
+
+                <div class="bottom-panel-content" id="debugPanelContent"
+                    style="display: none; height: 100%; padding: 0;">
+                </div>
+
+            </div>
+
+            <div class="modal-backdrop" id="modalBackdrop"></div>
+
+            <div class="island-modal" id="islandModal">
+                <h3 id="modalLabel">Name:</h3>
+                <input type="text" id="modalInput" placeholder="Enter name..." autocomplete="off">
+                <input type="password" id="modalPassword" placeholder="Enter password..." style="display: none;"
+                    autocomplete="off">
+                <input type="password" id="modalConfirm" placeholder="Confirm password..." style="display: none;"
+                    autocomplete="off">
+                <div class="error-msg" id="modalError">Passwords do not match.</div>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" id="modalCancel">Cancel</button>
+                    <button class="btn-submit" id="modalSubmit">Create</button>
+                </div>
+            </div>
+
+            <div class="island-modal" id="genericModal">
+                <h3 id="genModalLabel">Title</h3>
+                <p id="genModalText" style="display:none; font-size:13px; margin-bottom:5px; color: var(--text-muted);">
+                </p>
+                <input type="text" id="genModalInput" style="display:none;" autocomplete="off">
+                <input type="password" id="genModalPassword" style="display:none;" autocomplete="off">
+                <div class="error-msg" id="genModalError"></div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" id="genModalCancel">Cancel</button>
+                    <button class="btn-submit" id="genModalSubmit">OK</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-left">
+            <div class="status-item hide-on-mobile" id="" style="cursor: pointer;" title=""><i
+                    class="ri-git-branch-line"></i> main</div>
+                <div class="hide-on-mobile" style="width: 1px; height: 16px; background: var(--border-color); margin: 0 8px;"></div>
+            <div class="status-item" id="statusProblemsToggle" style="cursor: pointer;" title="Problems"><i
+                    class="ri-error-warning-line"></i> 0</div>
+            <div class="status-item" id="statusConsoleToggle" style="cursor: pointer;" title="Console"><i
+                    class="ri-terminal-box-line"></i></div>
+            <div class="status-item" id="statusDebugToggle" style="cursor: pointer;" title="Debug"><i
+                    class="ri-bug-line"></i></div>
+            <div class="status-item"><span id="activeFileStatus">Workspace</span></div>
+
+        </div>
+        <div class="status-right">
+            <div class="status-item hide-on-mobile" id="statusSpaces" style="display: none; cursor: pointer;">spaces: 4
+            </div>
+            <div class="status-item hide-on-mobile" id="statusLnCol" style="display: none; cursor: pointer;">Ln 1, Col 1
+            </div>
+            <div class="status-item" id="statusLineEnding" style="display: none; cursor: pointer;">LF</div>
+            <div class="status-item" id="statusEncoding" style="display: none; cursor: pointer;">UTF-8</div>
+            <div class="status-item" id="nowIsland" style="cursor: pointer;"><i class="ri-layout-bottom-2-line"></i>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="context-menu" id="contextMenu"></div>
+
+    <div id="profileLoadingOverlay" class="profile-loading-overlay">
+        <div class="profile-loading-center">
+            <i class="ri-user-smile-line profile-loading-icon"></i>
+            <div id="profileLoadingName" class="profile-loading-name">Profile Name</div>
+        </div>
+        <div class="profile-loading-bottom-right">
+            <i class="ri-loader-4-line profile-loading-spinner" id="profileLoadingSpinner"></i>
+            <span id="profileLoadingText">Loading profile...</span>
+        </div>
+    </div>
+
+    <div id="gotoLinePopover"
+        style="display:none; position:absolute; bottom: 30px; right: 100px; background:var(--bg-white); border:1px solid var(--border-color); padding:5px; border-radius:4px; box-shadow: 0 4px 12px var(--shadow-color); z-index: 1000;">
+        <input type="text" id="gotoLineInput" placeholder="Line:Column"
+            style="width: 100px; font-size:12px; padding:4px 8px; border:1px solid var(--border-color); border-radius:2px; outline:none; background:var(--bg-panel); color:var(--text-main);">
+    </div>
+
+    <script>
+        // Register Service Worker silently (No UI indicators)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                console.error('SW Registration failed:', err);
+            });
+        });
+    }
+    </script>
+
+    <script src="settings-profile.js"></script>
+    <script src="editor.js"></script>
+    <script src="notebook-kernels.js"></script>
+    <script src="notebook-ui.js"></script>
+    <script src="environments.js"></script>
+    <script src="app.js"></script>
+    <script src="up-down.js"></script>
+    <script src="media.js"></script>
+    <script src="archive.js"></script>
+    <script src="docs.js"></script>
+    <script src="pdf-viewer.js"></script>
+    <script src="script.js"></script>
+    <script src="help-feedback.js"></script>
+    <script src="preview.js"></script>
+    <script src="stacks.js"></script>
+    <script src="terminal-commands.js"></script>
+    <script src="terminal-window.js"></script>
+    <script src="console.js"></script>
+    <script src="now-island.js"></script>
+    <script src="search.js"></script>
+</body>
+
+</html>

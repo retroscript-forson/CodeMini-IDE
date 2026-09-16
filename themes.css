@@ -1,0 +1,1319 @@
+/* ============================================
+    CODEMINI THEME SYSTEM
+   Color Themes: Light, Dark, Light+, Dark+.
+   Theme Packs: None, CodeMini Premium, CodeMini Premium Light.
+
+   Light+ and Dark+ are DEEPER variants of the base themes - darker,
+   richer base tones and punchier, more saturated accents/borders. Not
+   high-contrast, and Dark+ stops short of pure OLED black. Inactive tabs
+   and window tabs use a visibly dimmer surface + text color than active
+   ones so the active item is always unambiguous.
+
+   A Theme Pack is a separate, more sweeping layer than Color Theme: when
+   one is active it OVERRIDES/LOCKS Color Theme (and Accent Color)
+   entirely - see applyTheme() in settings-profile.js - rather than
+   layering on top of it. CodeMini Premium is a gold/amber-accented,
+   very-rounded/pill-shaped identity that reaches nearly every corner of
+   the UI, on a deep-dark (not pure black) base. CodeMini Premium Light is
+   the same identity on a warm, deeper-than-base-Light base instead.
+   Both share every structural rule (radius, layout) via a
+   [data-theme-pack^="codemini-premium"] prefix selector - only their
+   color variable blocks differ, each scoped with an exact match.
+
+   Architecture:
+   - data-theme: "light" or "dark" - keeps every existing dark-mode
+     component override below working unchanged across Dark, Dark+, and
+     any dark-based Theme Pack, and keeps the isDark checks in JS (Monaco
+     theme, notebook editors, etc.) correct.
+   - data-theme-variant: "base" or "plus" - layers refinement on top by
+     overriding a subset of CSS variables.
+   - data-theme-pack: "none" or a pack slug (e.g. "codemini-premium",
+     "codemini-premium-light") - when set to an active pack, its variable
+     block and structural rules take over completely; see
+     settings-profile.js applyTheme() for how Color Theme gets
+     forced/ignored while a pack is active.
+   ============================================ */
+
+/* Light Theme Variables (Default) */
+:root,
+[data-theme="light"] {
+  /* Base Colors */
+  --bg-base: #e0e0e0;
+  --bg-white: #ffffff;
+  --bg-panel: #f5f5f5;
+  --bg-panel-secondary: #fafafa;
+
+  /* Text Colors */
+  --text-main: #333333;
+  --text-muted: #666666;
+  --text-placeholder: #999999;
+  --text-inverse: #ffffff;
+
+  /* Border & Shadow */
+  --border-color: #cccccc;
+  --border-light: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.15);
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+
+  /* Accent Colors */
+  --accent-blue: #3794ff;
+  --accent-blue-dark: #0d47a1;
+  --accent-blue-light: #90caf9;
+  --accent-new: #00897b;
+  --accent-new-light: #26a69a;
+
+  /* Status Colors */
+  --color-danger: #d32f2f;
+  --color-warning: #fbc02d;
+  --color-success: #4caf50;
+  --color-unsaved: #ef5350;
+
+  /* UI Elements */
+  --bg-tabs-bar: #dcdcdc;
+  --bg-tab-inactive: #e8e8e8;
+  --bg-dropdown: #fafafa;
+  --bg-search: #f0f0f0;
+  --hover-blue: #e3f2fd;
+  --hover-gray: rgba(0, 0, 0, 0.04);
+
+  /* Icon Colors */
+  --icon-gray: #555555;
+  --icon-js: #fbc02d;
+  --icon-py: #3776ab;
+  --icon-html: #e34f26;
+  --icon-css: #1572b6;
+  --icon-json: #8bc34a;
+  --icon-md: #8e24aa;
+  --icon-java: #f89820;
+  --icon-pdf: #f40f02;
+  --icon-black: #000000;
+
+  /* Terminal Specific */
+  --term-bg: #1e1e1e;
+  --term-text: #cccccc;
+  --term-muted: #aaaaaa;
+  --term-output-bg: #1e1e1e;
+  --term-output-text: #d4d4d4;
+  --term-prompt-user: #4caf50;
+  --term-prompt-path: #2196f3;
+  --term-cmd-text: #ffffff;
+  --term-header-bg: #333333;
+  --term-black: #000000;
+  --term-yellow: #e5c07b;
+  --term-blue: #61afef;
+  --term-gray: #abb2bf;
+  --term-red: #e06c75;
+  --term-green: #98c379;
+
+  /* PDF Specific */
+  --pdf-bg: #e3e6e8;
+  --pdf-page-bg: #ffffff;
+  --pdf-text: #000000;
+
+  /* Search Highlight */
+  --search-highlight-bg: rgba(255, 255, 0, 0.4);
+
+  /* Settings Specific */
+  --settings-bg: #fafafa;
+  --settings-header-bg: #ffffff;
+  --settings-tab-active: #ffffff;
+
+  /* Activity Bar */
+  --activity-bar-bg: #f5f5f5;
+  --activity-item-active-bg: #ffffff;
+
+  /* Window Bar */
+  --window-bar-bg: #dcdcdc;
+  --window-tab-bg: #e8e8e8;
+  --window-tab-active-bg: #ffffff;
+
+  /* Modals */
+  --modal-bg: #ffffff;
+  --modal-backdrop: rgba(0, 0, 0, 0.5);
+
+  /* Monaco Editor Specific */
+  --monaco-bg: #ffffff;
+  --monaco-line-number: #237893;
+  --monaco-line-number-active: #0b216f;
+
+  /* Scrollbar */
+  --scrollbar-track: #f1f1f1;
+  --scrollbar-thumb: #c1c1c1;
+  --scrollbar-thumb-hover: #a8a8a8;
+}
+
+/* Light+ Theme Overlay: deeper version of Light - darker, richer chrome
+   tones (tab bar, panels, borders trend toward charcoal instead of pale
+   gray) and a punchier, more saturated accent. Content areas stay bright
+   and legible; it's the surrounding UI that goes deeper. Not high contrast. */
+[data-theme="light"][data-theme-variant="plus"] {
+  /* Base Colors - deeper surrounding chrome, crisp white content surface kept */
+  --bg-base: #c7c9cc;
+  --bg-white: #ffffff;
+  --bg-panel: #e4e5e8;
+  --bg-panel-secondary: #d7d9dc;
+
+  /* Text Colors - deepened for stronger read */
+  --text-main: #1a1c1f;
+  --text-muted: #52565c;
+  --text-placeholder: #8c9096;
+
+  /* Border & Shadow - darker, more defined edges; stronger depth */
+  --border-color: #aeb1b6;
+  --border-light: #c3c5c9;
+  --shadow-color: rgba(10, 12, 16, 0.28);
+  --shadow-light: rgba(10, 12, 16, 0.10);
+  --shadow-medium: rgba(10, 12, 16, 0.18);
+
+  /* Accent Colors - punchier, more saturated blue */
+  --accent-blue: #1565e0;
+  --accent-blue-dark: #0a3a8f;
+  --accent-blue-light: #6fa8f5;
+
+  /* UI Elements */
+  --bg-tabs-bar: #c7c9cc;
+  --bg-tab-inactive: #d3d5d8;
+  --bg-dropdown: #e4e5e8;
+  --bg-search: #dcdee1;
+  --hover-blue: #d7e7fc;
+  --hover-gray: rgba(0, 0, 0, 0.06);
+
+  /* Settings Specific */
+  --settings-bg: #e4e5e8;
+  --settings-header-bg: #ffffff;
+  --settings-tab-active: #ffffff;
+
+  /* Activity Bar */
+  --activity-bar-bg: #d7d9dc;
+  --activity-item-active-bg: #ffffff;
+
+  /* Window Bar */
+  --window-bar-bg: #c7c9cc;
+  --window-tab-bg: #d3d5d8;
+  --window-tab-active-bg: #ffffff;
+
+  /* Modals */
+  --modal-backdrop: rgba(10, 12, 16, 0.55);
+
+  /* Scrollbar */
+  --scrollbar-track: #dadcdf;
+  --scrollbar-thumb: #a6a9ae;
+  --scrollbar-thumb-hover: #90939a;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  /* Base Colors */
+  --bg-base: #1e1e1e;
+  --bg-white: #252526;
+  --bg-panel: #1e1e1e;
+  --bg-panel-secondary: #2d2d30;
+
+  /* Text Colors */
+  --text-main: #cccccc;
+  --text-muted: #9d9d9d;
+  --text-placeholder: #6e6e6e;
+  --text-inverse: #252526;
+
+  /* Border & Shadow */
+  --border-color: #3e3e42;
+  --border-light: #2d2d30;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --shadow-light: rgba(0, 0, 0, 0.3);
+  --shadow-medium: rgba(0, 0, 0, 0.4);
+
+  /* Accent Colors */
+  --accent-blue: #0078d4;
+  --accent-blue-dark: #005a9e;
+  --accent-blue-light: #4d9be6;
+  --accent-new: #26a69a;
+  --accent-new-light: #4db6ac;
+
+  /* Status Colors */
+  --color-danger: #f48771;
+  --color-warning: #cca700;
+  --color-success: #89d185;
+  --color-unsaved: #f14c4c;
+
+  /* UI Elements */
+  --bg-tabs-bar: #2d2d30;
+  --bg-tab-inactive: #2d2d30;
+  --bg-dropdown: #2d2d30;
+  --bg-search: #3c3c3c;
+  --hover-blue: rgba(0, 120, 212, 0.15);
+  --hover-gray: rgba(255, 255, 255, 0.05);
+
+  /* Icon Colors */
+  --icon-gray: #9d9d9d;
+  --icon-js: #fbc02d;
+  --icon-py: #4584b6;
+  --icon-html: #e44d26;
+  --icon-css: #264de4;
+  --icon-json: #c3e88d;
+  --icon-md: #c792ea;
+  --icon-java: #f89820;
+  --icon-pdf: #ff5555;
+  --icon-black: #cccccc;
+
+  /* Terminal Specific (kept dark as terminal should always be dark) */
+  --term-bg: #0d0d0d;
+  --term-text: #cccccc;
+  --term-muted: #808080;
+  --term-output-bg: #0d0d0d;
+  --term-output-text: #d4d4d4;
+  --term-prompt-user: #73c991;
+  --term-prompt-path: #4d9be6;
+  --term-cmd-text: #ffffff;
+  --term-header-bg: #1e1e1e;
+  --term-black: #0d0d0d;
+  --term-yellow: #dcdcaa;
+  --term-blue: #569cd6;
+  --term-gray: #808080;
+  --term-red: #f48771;
+  --term-green: #6a9955;
+
+  /* PDF Specific */
+  --pdf-bg: #1e1e1e;
+  --pdf-page-bg: #2d2d30;
+  --pdf-text: #cccccc;
+
+  /* Search Highlight */
+  --search-highlight-bg: rgba(255, 255, 0, 0.25);
+
+  /* Settings Specific */
+  --settings-bg: #1e1e1e;
+  --settings-header-bg: #252526;
+  --settings-tab-active: #252526;
+
+  /* Activity Bar */
+  --activity-bar-bg: #333337;
+  --activity-item-active-bg: #252526;
+
+  /* Window Bar */
+  --window-bar-bg: #2d2d30;
+  --window-tab-bg: #2d2d30;
+  --window-tab-active-bg: #252526;
+
+  /* Modals */
+  --modal-bg: #2d2d30;
+  --modal-backdrop: rgba(0, 0, 0, 0.7);
+
+  /* Monaco Editor Specific */
+  --monaco-bg: #252526;
+  --monaco-line-number: #858585;
+  --monaco-line-number-active: #c6c6c6;
+
+  /* Scrollbar */
+  --scrollbar-track: #1e1e1e;
+  --scrollbar-thumb: #424242;
+  --scrollbar-thumb-hover: #4f4f4f;
+}
+
+/* Dark+ Theme Overlay: deeper version of Dark - darker, richer near-black
+   base tones and punchier, more saturated accents/borders. Meaningfully
+   darker than base Dark, but stops short of pure OLED black. Inactive
+   tabs/windows use a visibly dimmer surface + text color than active ones,
+   so the active item stays clearly identifiable at a glance. */
+[data-theme="dark"][data-theme-variant="plus"] {
+  /* Base Colors - deeper near-blacks */
+  --bg-base: #0a0a0b;
+  --bg-white: #161618;
+  --bg-panel: #0d0d0e;
+  --bg-panel-secondary: #1c1c1f;
+
+  /* Text Colors - crisper, higher-contrast against the deeper base */
+  --text-main: #ececec;
+  --text-muted: #86868c;
+  --text-placeholder: #5c5c60;
+
+  /* Border & Shadow - stronger definition, more depth */
+  --border-color: #2c2c30;
+  --border-light: #202023;
+  --shadow-color: rgba(0, 0, 0, 0.7);
+  --shadow-light: rgba(0, 0, 0, 0.45);
+  --shadow-medium: rgba(0, 0, 0, 0.6);
+
+  /* Accent Colors - punchier, more saturated */
+  --accent-blue: #1f8fff;
+  --accent-blue-dark: #004c8c;
+  --accent-blue-light: #5fb3ff;
+
+  /* UI Elements - inactive tab surface kept clearly darker than --bg-white
+     (the active-tab/content surface) so active vs. inactive is unambiguous */
+  --bg-tabs-bar: #0a0a0b;
+  --bg-tab-inactive: #0a0a0b;
+  --bg-dropdown: #1c1c1f;
+  --bg-search: #202023;
+  --hover-blue: rgba(31, 143, 255, 0.16);
+  --hover-gray: rgba(255, 255, 255, 0.06);
+
+  /* Settings Specific */
+  --settings-bg: #0a0a0b;
+  --settings-header-bg: #161618;
+  --settings-tab-active: #161618;
+
+  /* Activity Bar */
+  --activity-bar-bg: #0d0d0e;
+  --activity-item-active-bg: #1c1c1f;
+
+  /* Window Bar - inactive window tab kept clearly darker than --bg-white
+     (the active-window surface) so the active window is unambiguous */
+  --window-bar-bg: #0a0a0b;
+  --window-tab-bg: #0a0a0b;
+  --window-tab-active-bg: #1c1c1f;
+
+  /* Modals */
+  --modal-bg: #1c1c1f;
+  --modal-backdrop: rgba(0, 0, 0, 0.75);
+
+  /* Monaco Editor Specific */
+  --monaco-bg: #161618;
+
+  /* Scrollbar */
+  --scrollbar-track: #0a0a0b;
+  --scrollbar-thumb: #38383d;
+  --scrollbar-thumb-hover: #48484e;
+}
+
+/* Inactive editor tabs have no dedicated text-color rule in the base
+   stylesheet (only .tab.active sets one), so on the deep Dark+ base they'd
+   otherwise inherit --text-main and look identical to the active tab.
+   Dim them explicitly here. */
+[data-theme="dark"][data-theme-variant="plus"] .tab:not(.active) {
+  color: var(--text-muted);
+}
+
+/* ============================================
+   CODEMINI PREMIUM THEME PACK
+   A complete, self-contained visual identity - deep dark (not pure black)
+   base, gold/amber accent, and very rounded/pill-like shapes throughout.
+   Selecting this pack overrides Color Theme entirely (see applyTheme() in
+   settings-profile.js, which forces data-theme="dark" and this attribute
+   whenever a pack is active) rather than layering on top of it.
+   ============================================ */
+[data-theme-pack^="codemini-premium"] {
+  /* Base Colors - deep dark, distinctly warmer/richer than Dark+'s near-black */
+  --bg-base: #121014;
+  --bg-white: #1c1a20;
+  --bg-panel: #17151a;
+  --bg-panel-secondary: #24212a;
+
+  /* Text Colors */
+  --text-main: #f0ecf2;
+  --text-muted: #8f8a97;
+  --text-placeholder: #625d6a;
+  --text-inverse: #1c1a20;
+
+  /* Border & Shadow */
+  --border-color: #322e3a;
+  --border-light: #26232b;
+  --shadow-color: rgba(0, 0, 0, 0.6);
+  --shadow-light: rgba(0, 0, 0, 0.35);
+  --shadow-medium: rgba(0, 0, 0, 0.48);
+
+  /* Accent Colors - gold/amber, the defining trait of this pack */
+  --accent-blue: #d9a441;
+  --accent-blue-dark: #9c7326;
+  --accent-blue-light: #eac97d;
+  --accent-new: #c9963a;
+  --accent-new-light: #e0b662;
+
+  /* Status Colors - warmed slightly to sit alongside the gold accent */
+  --color-danger: #e5675a;
+  --color-warning: #d9a441;
+  --color-success: #7fbf6a;
+  --color-unsaved: #e5675a;
+
+  /* UI Elements - inactive tab/window surfaces kept clearly darker than the
+     active surface (--bg-white), same principle as the Dark+ fix above */
+  --bg-tabs-bar: #121014;
+  --bg-tab-inactive: #121014;
+  --bg-dropdown: #24212a;
+  --bg-search: #24212a;
+  --hover-blue: rgba(217, 164, 65, 0.14);
+  --hover-gray: rgba(255, 255, 255, 0.06);
+
+  /* Icon Colors */
+  --icon-gray: #a39dab;
+  --icon-black: #f0ecf2;
+
+  /* Settings Specific */
+  --settings-bg: #121014;
+  --settings-header-bg: #1c1a20;
+  --settings-tab-active: #1c1a20;
+
+  /* Activity Bar */
+  --activity-bar-bg: #17151a;
+  --activity-item-active-bg: #24212a;
+
+  /* Window Bar - inactive window tab kept clearly darker than the active
+     window surface, so the active window is unambiguous at a glance */
+  --window-bar-bg: #121014;
+  --window-tab-bg: #121014;
+  --window-tab-active-bg: #24212a;
+
+  /* Modals */
+  --modal-bg: #24212a;
+  --modal-backdrop: rgba(0, 0, 0, 0.7);
+
+  /* Monaco Editor Specific */
+  --monaco-bg: #1c1a20;
+  --monaco-line-number: #625d6a;
+  --monaco-line-number-active: #d9a441;
+
+  /* Scrollbar */
+  --scrollbar-track: #121014;
+  --scrollbar-thumb: #3a3542;
+  --scrollbar-thumb-hover: #4a4450;
+
+  /* PDF Specific */
+  --pdf-bg: #121014;
+  --pdf-page-bg: #24212a;
+  --pdf-text: #f0ecf2;
+}
+
+/* Inactive editor tabs need an explicit dimmer text color, same reasoning
+   as the Dark+ fix above (the base stylesheet only styles .tab.active). */
+[data-theme-pack^="codemini-premium"] .tab:not(.active) {
+  color: var(--text-muted);
+}
+
+/* CODEMINI PREMIUM LIGHT - the same gold/amber, very-rounded identity as
+   CodeMini Premium, built on a warm, deeper-than-base-Light chrome instead
+   of near-black. Content surfaces stay bright and legible; the surrounding
+   chrome leans warm/champagne rather than Light+'s neutral charcoal, since
+   Premium's whole identity revolves around the gold accent. Shares every
+   structural rule below with dark Premium via the [data-theme-pack^=...]
+   prefix selector - only the color palette differs. */
+[data-theme-pack="codemini-premium-light"] {
+  /* Base Colors - warm, deeper chrome; crisp, bright content surface kept */
+  --bg-base: #ded2b8;
+  --bg-white: #fffdf8;
+  --bg-panel: #efe6d3;
+  --bg-panel-secondary: #e5d9c0;
+
+  /* Text Colors */
+  --text-main: #241f14;
+  --text-muted: #766c54;
+  --text-placeholder: #a89c7d;
+  --text-inverse: #fffdf8;
+
+  /* Border & Shadow */
+  --border-color: #cabb96;
+  --border-light: #ddd1b0;
+  --shadow-color: rgba(50, 38, 10, 0.22);
+  --shadow-light: rgba(50, 38, 10, 0.08);
+  --shadow-medium: rgba(50, 38, 10, 0.14);
+
+  /* Accent Colors - the same gold/amber, deepened slightly for contrast on a light base */
+  --accent-blue: #a8761f;
+  --accent-blue-dark: #7a5613;
+  --accent-blue-light: #d9ab52;
+  --accent-new: #96681c;
+  --accent-new-light: #c99a3f;
+
+  /* Status Colors - warmed slightly to sit alongside the gold accent */
+  --color-danger: #c2483a;
+  --color-warning: #a8761f;
+  --color-success: #4f8f3d;
+  --color-unsaved: #c2483a;
+
+  /* UI Elements - inactive tab/window surfaces kept clearly deeper than the
+     active surface (--bg-white), same principle as dark Premium */
+  --bg-tabs-bar: #ded2b8;
+  --bg-tab-inactive: #ded2b8;
+  --bg-dropdown: #e5d9c0;
+  --bg-search: #e5d9c0;
+  --hover-blue: rgba(168, 118, 31, 0.12);
+  --hover-gray: rgba(0, 0, 0, 0.05);
+
+  /* Icon Colors */
+  --icon-gray: #786d54;
+  --icon-black: #241f14;
+
+  /* Settings Specific */
+  --settings-bg: #ded2b8;
+  --settings-header-bg: #fffdf8;
+  --settings-tab-active: #fffdf8;
+
+  /* Activity Bar */
+  --activity-bar-bg: #efe6d3;
+  --activity-item-active-bg: #fffdf8;
+
+  /* Window Bar - inactive window tab kept clearly deeper than the active
+     window surface, so the active window is unambiguous at a glance */
+  --window-bar-bg: #ded2b8;
+  --window-tab-bg: #ded2b8;
+  --window-tab-active-bg: #fffdf8;
+
+  /* Modals */
+  --modal-bg: #fffdf8;
+  --modal-backdrop: rgba(50, 38, 10, 0.35);
+
+  /* Monaco Editor Specific */
+  --monaco-bg: #fffdf8;
+  --monaco-line-number: #a89c7d;
+  --monaco-line-number-active: #a8761f;
+
+  /* Scrollbar */
+  --scrollbar-track: #ded2b8;
+  --scrollbar-thumb: #c2b490;
+  --scrollbar-thumb-hover: #b0a17a;
+
+  /* PDF Specific */
+  --pdf-bg: #ded2b8;
+  --pdf-page-bg: #fffdf8;
+  --pdf-text: #241f14;
+}
+
+/* --- Structural: very rounded, pill-like shapes throughout ---
+   Scoped to specific interactive/container element classes rather than a
+   blanket * selector, so genuinely circular elements (avatars, status
+   dots, round toggle knobs - anything already using border-radius: 50%)
+   and flush edge-to-edge list rows (file-item, settings-item, which rely
+   on a flush border-left/border-bottom to indicate selection/separation)
+   are left untouched. Editor tabs and window tabs are intentionally left
+   at their default shape. */
+
+/* Pill-shaped: buttons, inputs, search, and compact inline controls */
+[data-theme-pack^="codemini-premium"] .search-bar,
+[data-theme-pack^="codemini-premium"] button:not(.tab-close),
+[data-theme-pack^="codemini-premium"] .help-feedback-send-btn,
+[data-theme-pack^="codemini-premium"] .dl-action-btn,
+[data-theme-pack^="codemini-premium"] .toolbar-dropdown,
+[data-theme-pack^="codemini-premium"] select,
+[data-theme-pack^="codemini-premium"] input[type="text"],
+[data-theme-pack^="codemini-premium"] input[type="password"],
+[data-theme-pack^="codemini-premium"] input[type="number"],
+[data-theme-pack^="codemini-premium"] input[type="color"],
+[data-theme-pack^="codemini-premium"] .settings-control input[type="color"]::-webkit-color-swatch {
+  border-radius: 999px !important;
+}
+
+/* Floating menus, popups, and cards */
+[data-theme-pack^="codemini-premium"] .island-modal,
+[data-theme-pack^="codemini-premium"] .explorer-dropdown,
+[data-theme-pack^="codemini-premium"] .context-menu,
+[data-theme-pack^="codemini-premium"] .context-submenu,
+[data-theme-pack^="codemini-premium"] .mobile-dropdown,
+[data-theme-pack^="codemini-premium"] .responsive-dropdown,
+[data-theme-pack^="codemini-premium"] .ct-responsive-dropdown,
+[data-theme-pack^="codemini-premium"] .monaco-menu-container,
+[data-theme-pack^="codemini-premium"] .monaco-editor .suggest-widget,
+[data-theme-pack^="codemini-premium"] .launcher-card,
+[data-theme-pack^="codemini-premium"] .custom-toast,
+[data-theme-pack^="codemini-premium"] .help-details,
+[data-theme-pack^="codemini-premium"] .help-feedback-box {
+  border-radius: 20px !important;
+}
+
+/* Hoverable rows with real padding on all sides (as opposed to flush
+   edge-to-edge list rows, which are left alone) */
+[data-theme-pack^="codemini-premium"] .dropdown-item {
+  border-radius: 10px !important;
+  margin: 2px 6px;
+}
+
+[data-theme-pack^="codemini-premium"] .monaco-menu .action-item,
+[data-theme-pack^="codemini-premium"] .quick-start-item,
+[data-theme-pack^="codemini-premium"] .problem-row {
+  border-radius: 10px !important;
+}
+
+[data-theme-pack^="codemini-premium"] .problem-file {
+  border-radius: 10px !important;
+}
+
+/* The Document ribbon's tabs (Home/Insert/Layout) are menu-like chrome
+   rather than persistent file/window tabs, so - unlike .tab, which is
+   deliberately left square everywhere (see the note above) - they do pick
+   up the rounded top corners under the pill/round premium pack. Every
+   other theme leaves them square by default (see .doc-ribbon-tab in
+   style.css). */
+[data-theme-pack^="codemini-premium"] .doc-ribbon-tab {
+  border-radius: 10px 10px 0 0 !important;
+}
+
+/* Small inline tags/badges: keyboard shortcuts, type tags, code snippets */
+[data-theme-pack^="codemini-premium"] .kbd-badge,
+[data-theme-pack^="codemini-premium"] .help-content kbd,
+[data-theme-pack^="codemini-premium"] .var-type-badge,
+[data-theme-pack^="codemini-premium"] .markdown-rendered code,
+[data-theme-pack^="codemini-premium"] .markdown-rendered pre {
+  border-radius: 6px !important;
+}
+
+/* Bottom-panel console (dynamically injected per-pane with ID-scoped
+   inline styles, so !important is needed here to win over them) */
+[data-theme-pack^="codemini-premium"] .console-input {
+  border-radius: 18px !important;
+}
+[data-theme-pack^="codemini-premium"] .input-actions .icon {
+  border-radius: 8px !important;
+}
+
+/* Settings search bar + changelog cards */
+[data-theme-pack^="codemini-premium"] .settings-search-bar input {
+  border-radius: 999px !important;
+}
+[data-theme-pack^="codemini-premium"] .settings-search-clear {
+  border-radius: 8px !important;
+}
+[data-theme-pack^="codemini-premium"] .update-item {
+  border-radius: 14px !important;
+}
+
+/* Now Island floating panel */
+[data-theme-pack^="codemini-premium"] #nowIslandPanel {
+  border-radius: 20px !important;
+}
+[data-theme-pack^="codemini-premium"] .ni-header {
+  border-radius: 20px 20px 0 0 !important;
+}
+[data-theme-pack^="codemini-premium"] .ni-body {
+  border-radius: 0 0 20px 20px !important;
+}
+
+/* Running Stacks / kernels panel */
+[data-theme-pack^="codemini-premium"] .kernel-card-header {
+  border-radius: 14px 14px 0 0 !important;
+}
+[data-theme-pack^="codemini-premium"] .kernel-card-body {
+  border-radius: 0 0 14px 14px !important;
+}
+[data-theme-pack^="codemini-premium"] .kernel-idle-row,
+[data-theme-pack^="codemini-premium"] .kernel-usage-row,
+[data-theme-pack^="codemini-premium"] .stack-item-row {
+  border-radius: 10px !important;
+}
+[data-theme-pack^="codemini-premium"] .kernel-usage-count,
+[data-theme-pack^="codemini-premium"] .stack-badge,
+[data-theme-pack^="codemini-premium"] .kernel-badge {
+  border-radius: 999px !important;
+}
+[data-theme-pack^="codemini-premium"] .stack-action-icon {
+  border-radius: 8px !important;
+}
+
+/* Find & Replace bar */
+[data-theme-pack^="codemini-premium"] .search-opt-btn,
+[data-theme-pack^="codemini-premium"] .search-nav-btn {
+  border-radius: 999px !important;
+}
+[data-theme-pack^="codemini-premium"] .mobile-search-input {
+  border-radius: 999px !important;
+}
+
+/* Notebook cell content: live markdown rendering + SQL result actions +
+   sanitized-output warning banner */
+[data-theme-pack^="codemini-premium"] .nb-inline-code {
+  border-radius: 6px !important;
+}
+[data-theme-pack^="codemini-premium"] .nb-code-block {
+  border-radius: 12px !important;
+}
+[data-theme-pack^="codemini-premium"] .sql-table-btn {
+  border-radius: 999px !important;
+}
+[data-theme-pack^="codemini-premium"] .blocked-content-indicator {
+  border-radius: 10px !important;
+}
+
+/* Notebook cells: the actual cell "card" is .cell-input (the bordered,
+   backgrounded box around each cell's editor) - .cell itself is a flush
+   full-width row like file-item/settings-item and is intentionally left
+   alone. overflow: hidden is added so the rounded corners actually clip
+   the sticky toolbar and Monaco editor inside rather than letting them
+   poke out past the curve. */
+[data-theme-pack^="codemini-premium"] .cell-input {
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+[data-theme-pack^="codemini-premium"] .cell-toolbar {
+  border-radius: 14px 14px 0 0 !important;
+}
+[data-theme-pack^="codemini-premium"] .cell-output {
+  border-radius: 10px !important;
+}
+[data-theme-pack^="codemini-premium"] .cell-tags {
+  border-radius: 14px 14px 0 0 !important;
+}
+[data-theme-pack^="codemini-premium"] .sql-table-responsive {
+  border-radius: 14px !important;
+}
+[data-theme-pack^="codemini-premium"] .add-cell {
+  border-radius: 12px !important;
+}
+[data-theme-pack^="codemini-premium"] .plot-card {
+  border-radius: 12px !important;
+}
+[data-theme-pack^="codemini-premium"] .drag-placeholder {
+  border-radius: 8px !important;
+}
+
+/* Top search / command island */
+[data-theme-pack^="codemini-premium"] .top-search-island {
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+[data-theme-pack^="codemini-premium"] .top-search-item {
+  border-radius: 10px !important;
+  margin: 2px 6px;
+  width: calc(100% - 12px);
+  box-sizing: border-box;
+}
+
+/* Stacks sidebar search bar (the visible bordered box is the wrapper div,
+   not the transparent input inside it - just classed in stacks.js) */
+[data-theme-pack^="codemini-premium"] .stack-search-bar {
+  border-radius: 999px !important;
+}
+
+/* Quick Start drag-and-drop folder zone (just classed in script.js) */
+[data-theme-pack^="codemini-premium"] .dnd-folder-zone {
+  border-radius: 16px !important;
+}
+
+/* Live Preview inspector: search inputs, small pill tags/badges/buttons,
+   and compact panels. Left alone: .lp-inspector-panel (full-height
+   edge-docked side panel, same reasoning as .sidebar), .lp-header /
+   .lp-statusbar / #lpNetworkPanel (full-width docked bars, same reasoning
+   as .tabs-bar), and internal row dividers like .insp-style-row / .net-req
+   (flush list rows, same reasoning as .file-item). */
+[data-theme-pack^="codemini-premium"] .sm-search,
+[data-theme-pack^="codemini-premium"] .insp-style-search,
+[data-theme-pack^="codemini-premium"] .net-search,
+[data-theme-pack^="codemini-premium"] .sm-edit-input {
+  border-radius: 999px !important;
+}
+[data-theme-pack^="codemini-premium"] .sm-origin-tag,
+[data-theme-pack^="codemini-premium"] .net-count-badge,
+[data-theme-pack^="codemini-premium"] .insp-lock-indicator,
+[data-theme-pack^="codemini-premium"] .net-filter-btn,
+[data-theme-pack^="codemini-premium"] .rg-count,
+[data-theme-pack^="codemini-premium"] .insp-crumb {
+  border-radius: 999px !important;
+}
+[data-theme-pack^="codemini-premium"] .sm-scope-toggle,
+[data-theme-pack^="codemini-premium"] .sm-expand-panel,
+[data-theme-pack^="codemini-premium"] .net-body-pre {
+  border-radius: 10px !important;
+}
+
+/* Theme Transition */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Prevent transition on page load */
+.no-transition * {
+  transition: none !important;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Monaco Editor Theme Overrides */
+[data-theme="dark"] .monaco-editor,
+[data-theme="dark"] .monaco-editor .margin,
+[data-theme="dark"] .monaco-editor-background {
+  background-color: var(--monaco-bg) !important;
+}
+
+[data-theme="dark"] .monaco-editor .line-numbers {
+  color: var(--monaco-line-number) !important;
+}
+
+/* Window Bar Dark Theme Fixes */
+[data-theme="dark"] .window-tab {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .window-tab.active {
+  color: var(--text-main);
+}
+
+/* Tab Bar Dark Theme */
+[data-theme="dark"] .tab {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .tab.active {
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .tab.active[data-type="terminal"] {
+  background-color: var(--term-bg) !important;
+  color: var(--term-text) !important;
+}
+
+/* Activity Bar Dark Theme */
+[data-theme="dark"] .activity-bar {
+  background-color: var(--activity-bar-bg);
+}
+
+[data-theme="dark"] .activity-item.active {
+  background-color: var(--activity-item-active-bg);
+}
+
+/* File Browser Dark Theme */
+[data-theme="dark"] .file-item:hover {
+  background-color: var(--hover-gray);
+}
+
+[data-theme="dark"] .file-item.selected-file {
+  background-color: var(--hover-blue);
+}
+
+/* Dropdown Dark Theme */
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: var(--hover-gray);
+}
+
+/* Input Fields Dark Theme */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+[data-theme="dark"] .settings-control select,
+[data-theme="dark"] .settings-control input[type="text"],
+[data-theme="dark"] .settings-control input[type="number"] {
+  background-color: transparent;
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+  background-color: transparent;
+  border-color: var(--accent-blue);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--text-placeholder);
+}
+
+/* Modal Dark Theme */
+[data-theme="dark"] .island-modal {
+  background-color: var(--modal-bg);
+}
+
+/* Search Bar Dark Theme */
+[data-theme="dark"] .search-bar {
+  background-color: var(--bg-search);
+}
+
+/* Launcher Cards Dark Theme */
+[data-theme="dark"] .launcher-card {
+  background-color: var(--bg-panel);
+}
+
+[data-theme="dark"] .launcher-card:hover {
+  background-color: var(--hover-blue);
+}
+
+/* PDF Editor Dark Theme */
+[data-theme="dark"] .pdf-page {
+  background-color: var(--pdf-page-bg);
+  color: var(--pdf-text);
+}
+
+/* Context Menu Dark Theme */
+[data-theme="dark"] .context-menu,
+[data-theme="dark"] .explorer-dropdown,
+[data-theme="dark"] .mobile-dropdown {
+  background-color: var(--bg-dropdown);
+  border-color: var(--border-color);
+}
+
+/* Status Bar Dark Theme */
+[data-theme="dark"] .status-bar {
+  background-color: var(--bg-panel);
+  border-top: 1px solid var(--border-color);
+}
+
+/* Settings Specific Dark Theme */
+[data-theme="dark"] .settings-container.flex-col {
+  background-color: var(--bg-white);
+}
+
+[data-theme="dark"] .settings-header,
+[data-theme="dark"] .profile-header {
+  background-color: var(--settings-header-bg);
+}
+
+[data-theme="dark"] .settings-tabs.settings-tabs-bottom {
+  background-color: var(--bg-panel);
+}
+
+/* Cell Input/Output Dark Theme */
+[data-theme="dark"] .cell-input {
+  background-color: var(--bg-white);
+}
+
+[data-theme="dark"] .cell-output {
+  background-color: var(--bg-panel);
+}
+
+[data-theme="dark"] .cell-toolbar {
+  background-color: var(--bg-panel-secondary);
+}
+
+/* Kernel Status Dark Theme */
+[data-theme="dark"] .kernel-status {
+  background-color: var(--bg-panel);
+}
+
+/* ====================================================
+   STACKS SIDEBAR DARK THEME FIXES
+   ==================================================== */
+
+/* General Container & Header */
+[data-theme="dark"] #stackSidebar {
+  background-color: var(--bg-white);
+}
+
+[data-theme="dark"] .stack-header-icons {
+  color: var(--icon-gray);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .stack-header-icons i {
+  color: var(--icon-gray);
+}
+
+[data-theme="dark"] .stack-header-icons i:hover {
+  color: var(--text-main);
+}
+
+/* Section Containers */
+[data-theme="dark"] .stack-section {
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .stack-title {
+  color: var(--text-main) !important;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+[data-theme="dark"] .stack-title i {
+  color: var(--icon-gray);
+}
+
+/* Dropdown Containers */
+[data-theme="dark"] #wsDropdownList,
+[data-theme="dark"] #tabsDropdownList,
+[data-theme="dark"] #kernelDropdown,
+[data-theme="dark"] #closedDropdownList,
+[data-theme="dark"] #binDropdownList {
+  background-color: var(--bg-white) !important;
+}
+
+[data-theme="dark"] #wsDropdownList.show,
+[data-theme="dark"] #tabsDropdownList.show,
+[data-theme="dark"] #kernelDropdown.show,
+[data-theme="dark"] #closedDropdownList.show,
+[data-theme="dark"] #binDropdownList.show {
+  background-color: var(--bg-white);
+}
+
+/* Item Typography Fixes */
+[data-theme="dark"] #stackSidebar,
+[data-theme="dark"] #stackSidebar div,
+[data-theme="dark"] #stackSidebar span,
+[data-theme="dark"] #stackSidebar p {
+  color-scheme: dark;
+}
+
+/* Stack Items General Hover */
+[data-theme="dark"] .stack-section > div[style*="cursor: pointer"]:hover,
+[data-theme="dark"] #wsDropdownList div:hover,
+[data-theme="dark"] #tabsDropdownList div:hover,
+[data-theme="dark"] #closedDropdownList div:hover,
+[data-theme="dark"] #binDropdownList > div:hover {
+  background-color: var(--hover-gray);
+}
+
+/* Action Icons inside Stacks */
+[data-theme="dark"] .stack-action i {
+  color: var(--accent-new);
+}
+[data-theme="dark"] .stack-action i:hover {
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .stack-action-icon {
+  color: var(--icon-gray);
+  opacity: 0.7;
+}
+[data-theme="dark"] .stack-action-icon:hover {
+  color: var(--text-main);
+  opacity: 1;
+}
+
+/* Specific Danger / Action Icons */
+[data-theme="dark"] .stack-action i[title="Forget All History"]:hover,
+[data-theme="dark"] .stack-action i[title="Close All Tabs"]:hover {
+  color: var(--color-danger);
+}
+[data-theme="dark"] .stack-action-icon[style*="color: var(--color-danger)"],
+[data-theme="dark"] i[style*="color: var(--color-danger)"],
+[data-theme="dark"] i[title="Empty Bin"] {
+  color: var(--color-danger) !important;
+}
+[data-theme="dark"] i[title="Restore Item"],
+[data-theme="dark"] i[title="Restore All"] {
+  color: var(--accent-new) !important;
+}
+
+/* Badges (Foreground / Background / Timers) */
+[data-theme="dark"] .kernel-badge-fg {
+  background-color: rgba(76, 175, 80, 0.15) !important;
+  color: #81c784 !important;
+}
+[data-theme="dark"] .kernel-badge-bg {
+  background-color: var(--bg-panel-secondary) !important;
+  color: var(--text-muted) !important;
+}
+[data-theme="dark"] .bin-timer-badge {
+  background-color: rgba(245, 127, 23, 0.15) !important;
+  color: #ffd54f !important;
+  border-color: rgba(255, 213, 79, 0.3) !important;
+}
+
+/* General Badges / Counts */
+[data-theme="dark"] #stackSidebar .badge,
+[data-theme="dark"] #stackSidebar .count,
+[data-theme="dark"] .stack-badge {
+  background-color: var(--bg-panel-secondary);
+  color: var(--text-muted);
+  border-color: var(--border-color);
+}
+
+/* Exceptions for Muted Text */
+[data-theme="dark"] #stackSidebar [style*="color: var(--text-muted)"],
+[data-theme="dark"] #stackSidebar div[style*="color: #9e9e9e"],
+[data-theme="dark"] #stackSidebar div[style*="font-style: italic"],
+[data-theme="dark"] #closedDropdownList div,
+[data-theme="dark"] #binDropdownList > div {
+  color: var(--text-muted) !important;
+}
+
+/* Scrollbar inside Stacks */
+[data-theme="dark"] #stackSidebar::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+[data-theme="dark"] #stackSidebar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+}
+[data-theme="dark"] #stackSidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Package Status Area in Stacks */
+[data-theme="dark"] #kernelDropdown > div > div[style*="display: flex"] {
+  border-bottom: 1px solid transparent;
+}
+[data-theme="dark"] #kernelDropdown > div > div[style*="display: flex"]:hover {
+  background-color: var(--hover-gray);
+  border-radius: 4px;
+}
+[data-theme="dark"] .pkg-install-btn {
+  color: var(--accent-blue);
+}
+[data-theme="dark"] .pkg-install-btn:hover {
+  color: var(--accent-blue-light);
+}
+[data-theme="dark"] .pkg-installed {
+  color: var(--color-success);
+}
+[data-theme="dark"] .ri-loader-4-line {
+  color: var(--accent-blue);
+}
+
+/* ====================================================
+   OTHER OVERRIDES
+   ==================================================== */
+
+/* Quick Start Items Dark Theme */
+[data-theme="dark"] .quick-start-item:hover {
+  background-color: var(--hover-gray);
+}
+
+/* Profile Dark Theme */
+[data-theme="dark"] .profile-avatar-large {
+  background-color: var(--bg-white);
+}
+
+[data-theme="dark"] .profile-badge {
+  background-color: var(--bg-panel);
+}
+
+[data-theme="dark"] .profile-auth-buttons button {
+  background-color: var(--bg-white);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .profile-auth-buttons button:hover {
+  background-color: var(--bg-panel);
+}
+
+/* Keyboard Badge Dark Theme */
+[data-theme="dark"] .kbd-badge {
+  background-color: var(--bg-panel-secondary);
+  border-color: var(--border-color);
+}
+
+/* Top Menu Icons Dark Theme */
+[data-theme="dark"] .top-left i,
+[data-theme="dark"] .top-right i {
+  color: var(--icon-gray);
+}
+
+/* Add Tab Button Dark Theme */
+[data-theme="dark"] .tabs-bar .add-tab:hover {
+  background-color: var(--hover-gray);
+}
+
+/* Empty State Dark Theme */
+[data-theme="dark"] .empty-state {
+  color: var(--text-muted);
+}
+
+/* Monaco Editor Context Menu Dark Theme */
+[data-theme="dark"] .monaco-menu-container {
+  background-color: var(--bg-dropdown) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .monaco-menu .action-item:hover,
+[data-theme="dark"] .monaco-menu .action-item.focused {
+  background-color: var(--hover-gray) !important;
+}
+
+/* Suggest Widget Dark Theme */
+[data-theme="dark"] .monaco-editor .suggest-widget {
+  background-color: var(--bg-dropdown) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .monaco-editor .suggest-widget .monaco-list-row:hover {
+  background-color: var(--hover-gray) !important;
+}
+
+/* Settings Danger Button Dark Theme */
+[data-theme="dark"] .settings-danger-btn {
+  background: rgba(244, 135, 113, 0.1);
+  color: var(--color-danger);
+  border-color: rgba(244, 135, 113, 0.3);
+}
+
+[data-theme="dark"] .settings-danger-btn:hover {
+  background: rgba(244, 135, 113, 0.2);
+}
+
+/* Separator Dark Theme */
+[data-theme="dark"] .separator {
+  background-color: var(--border-color);
+}
+
+/* Toolbar Dark Theme */
+[data-theme="dark"] .toolbar {
+  background-color: var(--bg-white);
+}
+
+/* Window Bar Buttons */
+[data-theme="dark"] .window-tab i {
+  color: var(--icon-gray);
+}
+
+[data-theme="dark"] .window-tab i:hover {
+  color: var(--text-main);
+}
+
+/* Tab Close Button Hover */
+[data-theme="dark"] .tab-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Add Button Dark Theme */
+[data-theme="dark"] .add-button {
+  background-color: var(--accent-blue);
+}
+
+[data-theme="dark"] .add-button:hover {
+  background-color: var(--accent-blue-dark);
+}
+
+/* Search Button Dark Theme */
+[data-theme="dark"] .search-btn {
+  background-color: var(--accent-blue);
+}
+
+[data-theme="dark"] .search-btn:hover {
+  background-color: var(--accent-blue-dark);
+}
+
+/* File Browser Path Dark Theme */
+[data-theme="dark"] .file-browser-path p {
+  color: var(--accent-blue) !important;
+}
+
+/* Breadcrumb Dark Theme */
+[data-theme="dark"] #crumb-root,
+[data-theme="dark"] .crumb-link {
+  color: var(--accent-blue) !important;
+}
+
+/* Plot Card Dark Theme */
+[data-theme="dark"] .plot-card {
+  background-color: var(--bg-white);
+}
+
+/* Toolbar Dropdown Dark Theme */
+[data-theme="dark"] .toolbar-dropdown {
+  background-color: var(--bg-dropdown);
+  color: var(--text-main);
+}
+
+/* Mobile Dropdown Items Dark Theme */
+[data-theme="dark"] .mobile-dropdown .dropdown-item {
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .mobile-dropdown .dropdown-item i {
+  color: var(--icon-gray);
+}
+
+/* Disabled State */
+[data-theme="dark"] input:disabled,
+[data-theme="dark"] select:disabled,
+[data-theme="dark"] button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Focus Visible for Accessibility */
+[data-theme="dark"] *:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
